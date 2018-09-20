@@ -1,0 +1,6 @@
+language: java
+jdk: oraclejdk8
+deploy:
+  provider: heroku
+  app: wine-prog-2
+  app_key: 3766cb15-6723-46bc-bd56-1e75233e6c61
