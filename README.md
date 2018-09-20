@@ -1,1 +1,1 @@
-[](https://travis-ci.org/willmenn/wine.svg?branch=master)
+[travis](https://travis-ci.org/willmenn/wine.svg?branch=master)
