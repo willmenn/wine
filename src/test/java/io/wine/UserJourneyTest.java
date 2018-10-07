@@ -1,7 +1,5 @@
 package io.wine;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import io.wine.controller.OrderController.WineOrder;
 import io.wine.model.Orders;
 import io.wine.model.User;
@@ -31,7 +29,7 @@ public class UserJourneyTest extends WineApplicationTests {
     private String baseUrl;
 
     @Before
-    public void setUp() throws Exception {
+    public void setUp() {
         restTemplate = new RestTemplate();
         baseUrl = "http://localhost:" + port;
     }
@@ -66,7 +64,7 @@ public class UserJourneyTest extends WineApplicationTests {
     }
 
     private void removeWine(Integer orderId, Integer wineId, String sessionId, Integer orderArraySize,
-                         Integer wineStockToCompare) {
+                            Integer wineStockToCompare) {
         HttpHeaders headers = new HttpHeaders();
         headers.add("sessionId", sessionId);
         WineOrder wineOrder = WineOrder.builder().orderId(orderId).wineId(wineId).build();
@@ -99,7 +97,7 @@ public class UserJourneyTest extends WineApplicationTests {
         headers.add("sessionId", sessionId);
         HttpEntity entity = new HttpEntity<>(wine, headers);
         Wine actual = restTemplate.exchange(baseUrl + "/wines", POST, entity, Wine.class).getBody();
-
+        
         assertEquals(wine.getDescription(), actual.getDescription());
         assertEquals(wine.getName(), actual.getName());
         assertEquals(wine.getStock(), actual.getStock());
@@ -134,13 +132,5 @@ public class UserJourneyTest extends WineApplicationTests {
         assertNotNull(sessionId);
 
         return sessionId;
-    }
-
-    private String convertObject(Object obj) {
-        try {
-            return new ObjectMapper().writeValueAsString(obj);
-        } catch (JsonProcessingException e) {
-            throw new RuntimeException(e);
-        }
     }
 }
