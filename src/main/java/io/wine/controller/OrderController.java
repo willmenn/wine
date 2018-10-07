@@ -1,7 +1,9 @@
 package io.wine.controller;
 
 import io.wine.model.Orders;
+import io.wine.repository.OrdersRepository;
 import io.wine.service.OrderService;
+import lombok.Builder;
 import lombok.Data;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -16,16 +18,18 @@ import static org.springframework.web.bind.annotation.RequestMethod.*;
 public class OrderController {
 
     private OrderService service;
+    private OrdersRepository repository;
 
     @Autowired
-    public OrderController(OrderService service) {
+    public OrderController(OrderService service, OrdersRepository repository) {
         this.service = service;
+        this.repository = repository;
     }
 
-    @RequestMapping(method = POST, consumes = APPLICATION_JSON_VALUE, produces = APPLICATION_JSON_VALUE)
+    @RequestMapping(method = POST, produces = APPLICATION_JSON_VALUE)
     @ResponseStatus(CREATED)
-    public Orders createOrder(@RequestBody Orders order) {
-        return order;
+    public Orders createOrder() {
+        return repository.save(new Orders());
     }
 
     @RequestMapping(value = "/{id}", method = DELETE)
@@ -53,7 +57,8 @@ public class OrderController {
     }
 
     @Data
-    class WineOrder {
+    @Builder
+    public static class WineOrder {
         private Integer wineId;
         private Integer orderId;
     }

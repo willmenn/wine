@@ -1,5 +1,6 @@
 package io.wine.service;
 
+import io.wine.exception.DoNotHaveStockException;
 import io.wine.exception.OrderNotFoundException;
 import io.wine.exception.WineNotFoundException;
 import io.wine.model.Orders;
@@ -23,16 +24,24 @@ public class OrderService {
     }
 
     public Orders addWineToOrder(Integer wineId, Integer orderId) {
-        wineRepository.findById(wineId).orElseThrow(WineNotFoundException::new);
-        Orders orders = ordersRepository.findById(orderId).orElseThrow(OrderNotFoundException::new);
-        orders.getWineIds().add(wineId);
-        return ordersRepository.save(orders);
+        Wine wine = wineRepository.findById(wineId).orElseThrow(WineNotFoundException::new);
+        if (wine.getStock() > 0) {
+            Orders orders = ordersRepository.findById(orderId).orElseThrow(OrderNotFoundException::new);
+            orders.getWineIds().add(wineId);
+            wine.setStock(wine.getStock() - 1);
+            wineRepository.save(wine);
+            return ordersRepository.save(orders);
+        } else {
+            throw new DoNotHaveStockException();
+        }
     }
 
     public Orders removeWineToOrder(Integer wineId, Integer orderId) {
-        wineRepository.findById(wineId).orElseThrow(WineNotFoundException::new);
+        Wine wine = wineRepository.findById(wineId).orElseThrow(WineNotFoundException::new);
         Orders orders = ordersRepository.findById(orderId).orElseThrow(OrderNotFoundException::new);
         orders.getWineIds().remove(wineId);
+        wine.setStock(wine.getStock() + 1);
+        wineRepository.save(wine);
         return ordersRepository.save(orders);
     }
 }
