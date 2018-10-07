@@ -5,15 +5,15 @@ import io.wine.model.User;
 import io.wine.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.Random;
 import java.util.concurrent.ConcurrentHashMap;
 
+import static org.springframework.http.HttpStatus.NO_CONTENT;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static org.springframework.web.bind.annotation.RequestMethod.DELETE;
 import static org.springframework.web.bind.annotation.RequestMethod.GET;
 import static org.springframework.web.bind.annotation.RequestMethod.POST;
 
@@ -52,9 +52,13 @@ public class UserController {
         throw new UserAuthenticationFailedException("Error Authenticating.");
     }
 
-
-    @RequestMapping(method = GET, value = "/all")
-    public Iterable<User> getAll() {
-        return repository.findAll();
+    @RequestMapping(value = "/{username}", method = DELETE)
+    @ResponseStatus(NO_CONTENT)
+    public void logout(@PathVariable("username") String username,
+                       @RequestHeader("sessionId") String sessionId) {
+        String sessionUsername = sessionMap.get(sessionId).getUsername();
+        if (sessionUsername.equals(username)) {
+            sessionMap.remove(sessionId);
+        }
     }
 }

@@ -13,9 +13,8 @@ import org.springframework.web.client.RestTemplate;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.springframework.http.HttpMethod.GET;
-import static org.springframework.http.HttpMethod.POST;
-import static org.springframework.http.HttpMethod.PUT;
+import static org.junit.Assert.assertTrue;
+import static org.springframework.http.HttpMethod.*;
 
 public class UserJourneyTest extends WineApplicationTests {
 
@@ -40,11 +39,16 @@ public class UserJourneyTest extends WineApplicationTests {
         createUser(user);
         String sessionId = auth(user.getUsername(), user.getPassword());
         Wine wine = Wine.builder().description("description Random").name("tinto").stock(1).build();
+
         int wineId = createWine(wine, sessionId);
         Integer orderId = createOrder(sessionId);
+
         addWine(orderId, wineId, sessionId, 1, 0);
         removeWine(orderId, wineId, sessionId, 0, 1);
 
+        finalizeOrder(orderId, sessionId);
+
+        logout(user.getUsername(), sessionId);
     }
 
     private void addWine(Integer orderId, Integer wineId, String sessionId, Integer orderArraySize,
@@ -97,7 +101,7 @@ public class UserJourneyTest extends WineApplicationTests {
         headers.add("sessionId", sessionId);
         HttpEntity entity = new HttpEntity<>(wine, headers);
         Wine actual = restTemplate.exchange(baseUrl + "/wines", POST, entity, Wine.class).getBody();
-        
+
         assertEquals(wine.getDescription(), actual.getDescription());
         assertEquals(wine.getName(), actual.getName());
         assertEquals(wine.getStock(), actual.getStock());
@@ -116,12 +120,28 @@ public class UserJourneyTest extends WineApplicationTests {
         return actual.getId();
     }
 
+    private void finalizeOrder(Integer orderId, String sessionId) {
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("sessionId", sessionId);
+        HttpEntity entity = new HttpEntity<>(headers);
+
+        restTemplate.exchange(baseUrl + "/orders" + "/" + orderId, DELETE, entity, Void.class);
+    }
+
     private void createUser(User user) {
         HttpEntity entity = new HttpEntity<>(user);
         User actual = restTemplate.exchange(baseUrl + "/users", POST, entity, User.class).getBody();
 
         assertEquals(user.getUsername(), actual.getUsername());
         assertEquals(user.getPassword(), actual.getPassword());
+    }
+
+    private void logout(String username, String sessionId) {
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("sessionId", sessionId);
+        HttpEntity entity = new HttpEntity<>(headers);
+
+        restTemplate.exchange(baseUrl + "/users/" + username, DELETE, entity, Void.class);
     }
 
     private String auth(String username, String password) {
