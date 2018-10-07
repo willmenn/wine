@@ -1,5 +1,6 @@
 package io.wine.controller;
 
+import io.wine.exception.OrderNotFoundException;
 import io.wine.model.Orders;
 import io.wine.repository.OrdersRepository;
 import io.wine.service.OrderService;
@@ -40,17 +41,17 @@ public class OrderController {
 
     @RequestMapping(value = "/{id}", method = GET, produces = APPLICATION_JSON_VALUE)
     @ResponseStatus(OK)
-    public Orders getOrder(@PathVariable("id") String id) {
-        return new Orders();
+    public Orders getOrder(@PathVariable("id") Integer id) {
+        return repository.findById(id).orElseThrow(OrderNotFoundException::new);
     }
 
-    @RequestMapping(value = "/wine/add",method = PUT, consumes = APPLICATION_JSON_VALUE, produces = APPLICATION_JSON_VALUE)
+    @RequestMapping(value = "/wine/add", method = PUT, consumes = APPLICATION_JSON_VALUE, produces = APPLICATION_JSON_VALUE)
     @ResponseStatus(OK)
     public Orders addWineToOrder(@RequestBody WineOrder wineOrder) {
         return service.addWineToOrder(wineOrder.wineId, wineOrder.orderId);
     }
 
-    @RequestMapping(value = "/wine/remove",method = PUT, consumes = APPLICATION_JSON_VALUE, produces = APPLICATION_JSON_VALUE)
+    @RequestMapping(value = "/wine/remove", method = PUT, consumes = APPLICATION_JSON_VALUE, produces = APPLICATION_JSON_VALUE)
     @ResponseStatus(OK)
     public Orders removeWineToOrder(@RequestBody WineOrder wineOrder) {
         return service.removeWineToOrder(wineOrder.wineId, wineOrder.orderId);

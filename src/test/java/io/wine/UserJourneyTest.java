@@ -46,7 +46,7 @@ public class UserJourneyTest extends WineApplicationTests {
         Integer orderId = createOrder(sessionId);
         addWine(orderId, wineId, sessionId, 1, 0);
         removeWine(orderId, wineId, sessionId, 0, 1);
-        
+
     }
 
     private void addWine(Integer orderId, Integer wineId, String sessionId, Integer orderArraySize,
