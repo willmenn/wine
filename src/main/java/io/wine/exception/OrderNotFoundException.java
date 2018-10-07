@@ -5,5 +5,5 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import static org.springframework.http.HttpStatus.NOT_FOUND;
 
 @ResponseStatus(NOT_FOUND)
-public class WineNotFoundException extends RuntimeException{
+public class OrderNotFoundException extends RuntimeException {
 }

@@ -13,5 +13,5 @@ public class Orders {
     private int id;
     @Column
     @ElementCollection(targetClass=Integer.class)
-    private List<Integer> wineId;
+    private List<Integer> wineIds;
 }
