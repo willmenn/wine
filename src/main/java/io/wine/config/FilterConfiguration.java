@@ -9,7 +9,6 @@ import org.springframework.context.annotation.Configuration;
 
 import javax.servlet.*;
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -38,7 +37,7 @@ public class FilterConfiguration {
         }
 
         @Override
-        public void init(FilterConfig filterConfig) throws ServletException {
+        public void init(FilterConfig filterConfig) {
             //do nothing
         }
 

@@ -10,7 +10,6 @@ import io.wine.repository.WineRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-
 @Service
 public class OrderService {
 
@@ -25,11 +24,11 @@ public class OrderService {
 
     public Orders addWineToOrder(Integer wineId, Integer orderId) {
         Wine wine = wineRepository.findById(wineId).orElseThrow(WineNotFoundException::new);
+
         if (wine.getStock() > 0) {
             Orders orders = ordersRepository.findById(orderId).orElseThrow(OrderNotFoundException::new);
             orders.getWineIds().add(wineId);
-            wine.setStock(wine.getStock() - 1);
-            wineRepository.save(wine);
+            removeOneUnitFromStock(wine);
             return ordersRepository.save(orders);
         } else {
             throw new DoNotHaveStockException();
@@ -39,9 +38,21 @@ public class OrderService {
     public Orders removeWineToOrder(Integer wineId, Integer orderId) {
         Wine wine = wineRepository.findById(wineId).orElseThrow(WineNotFoundException::new);
         Orders orders = ordersRepository.findById(orderId).orElseThrow(OrderNotFoundException::new);
+
         orders.getWineIds().remove(wineId);
+
+        addOneUnitToStock(wine);
+
+        return ordersRepository.save(orders);
+    }
+
+    private void addOneUnitToStock(Wine wine) {
         wine.setStock(wine.getStock() + 1);
         wineRepository.save(wine);
-        return ordersRepository.save(orders);
+    }
+
+    private void removeOneUnitFromStock(Wine wine) {
+        wine.setStock(wine.getStock() - 1);
+        wineRepository.save(wine);
     }
 }
