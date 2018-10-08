@@ -1,156 +1,104 @@
 package io.wine;
 
-import io.wine.controller.OrderController.WineOrder;
-import io.wine.model.Orders;
 import io.wine.model.User;
 import io.wine.model.Wine;
+import io.wine.repository.OrdersRepository;
+import io.wine.repository.UserRepository;
+import io.wine.repository.WineRepository;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.web.server.LocalServerPort;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
 import org.springframework.web.client.RestTemplate;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-import static org.springframework.http.HttpMethod.*;
 
 public class UserJourneyTest extends WineApplicationTests {
 
     private static final String USERNAME = "william";
     private static final String PASSWORD = "1234";
+
     @LocalServerPort
     private Integer port;
 
-    private RestTemplate restTemplate;
+    private WineHelper wineHelper;
 
-    private String baseUrl;
+    private UserHelper userHelper;
+
+    private OrderHelper orderHelper;
+
+    @Autowired
+    private OrdersRepository ordersRepository;
+
+    @Autowired
+    private UserRepository userRepository;
+
+    @Autowired
+    private WineRepository wineRepository;
 
     @Before
     public void setUp() {
-        restTemplate = new RestTemplate();
-        baseUrl = "http://localhost:" + port;
+        RestTemplate restTemplate = new RestTemplate();
+        String baseUrl = "http://localhost:" + port;
+        wineHelper = new WineHelper(restTemplate, baseUrl);
+        userHelper = new UserHelper(restTemplate, baseUrl);
+        orderHelper = new OrderHelper(restTemplate, baseUrl, wineHelper);
+    }
+
+    @After
+    public void tearDown() {
+        ordersRepository.deleteAll();
+        userRepository.deleteAll();
+        wineRepository.deleteAll();
     }
 
     @Test
     public void createOrderAndFinishOrderUserJourneyTest() {
         User user = User.builder().username(USERNAME).password(PASSWORD).build();
-        createUser(user);
-        String sessionId = auth(user.getUsername(), user.getPassword());
+        userHelper.createUser(user);
+        String sessionId = userHelper.auth(user.getUsername(), user.getPassword());
         Wine wine = Wine.builder().description("description Random").name("tinto").stock(1).build();
 
-        int wineId = createWine(wine, sessionId);
-        Integer orderId = createOrder(sessionId);
+        int wineId = wineHelper.createWine(wine, sessionId);
+        Integer orderId = orderHelper.createOrder(sessionId);
 
-        addWine(orderId, wineId, sessionId, 1, 0);
-        removeWine(orderId, wineId, sessionId, 0, 1);
+        orderHelper.addWine(orderId, wineId, sessionId, 1, 0);
+        orderHelper.removeWine(orderId, wineId, sessionId, 0, 1);
 
-        finalizeOrder(orderId, sessionId);
+        orderHelper.finalizeOrder(orderId, sessionId);
 
-        logout(user.getUsername(), sessionId);
+        userHelper.logout(user.getUsername(), sessionId);
     }
 
-    private void addWine(Integer orderId, Integer wineId, String sessionId, Integer orderArraySize,
-                         Integer wineStockToCompare) {
-        HttpHeaders headers = new HttpHeaders();
-        headers.add("sessionId", sessionId);
-        WineOrder wineOrder = WineOrder.builder().orderId(orderId).wineId(wineId).build();
-        HttpEntity entity = new HttpEntity<>(wineOrder, headers);
+    @Test
+    public void createWineStoreUserJourneyTest() {
+        User user = User.builder().username(USERNAME).password(PASSWORD).build();
+        userHelper.createUser(user);
+        String sessionId = userHelper.auth(user.getUsername(), user.getPassword());
+        Wine wine1 = Wine.builder().description("description Random1").name("tinto1").stock(1).build();
+        Wine wine2 = Wine.builder().description("description Random2").name("tinto2").stock(2).build();
+        Wine wine3 = Wine.builder().description("description Random3").name("tinto3").stock(3).build();
 
-        Orders actual = restTemplate.exchange(baseUrl + "/orders/wine/add", PUT, entity, Orders.class).getBody();
+        int wineId1 = wineHelper.createWine(wine1, sessionId);
+        int wineId2 = wineHelper.createWine(wine2, sessionId);
+        int wineId3 = wineHelper.createWine(wine3, sessionId);
 
-        assertEquals(orderArraySize.intValue(), actual.getWineIds().size());
+        Wine wine1Get = wineHelper.getWine(wineId1, sessionId);
+        wineHelper.assertWines(wine1, wine1Get);
+        Wine wine2Get = wineHelper.getWine(wineId2, sessionId);
+        wineHelper.assertWines(wine2, wine2Get);
+        Wine wine3Get = wineHelper.getWine(wineId3, sessionId);
+        wineHelper.assertWines(wine3, wine3Get);
 
-        Wine wine = getWine(wineId, sessionId);
+        wineHelper.deleteWine(wine3Get.getId(), sessionId);
 
-        assertEquals(wineStockToCompare, wine.getStock());
-    }
+        String whiteWineName = "Vinho Branco";
+        Wine wineUpdated = wineHelper.updateWine(wine2Get.toBuilder().name(whiteWineName).build(), sessionId);
+        assertEquals(whiteWineName, wineUpdated.getName());
 
-    private void removeWine(Integer orderId, Integer wineId, String sessionId, Integer orderArraySize,
-                            Integer wineStockToCompare) {
-        HttpHeaders headers = new HttpHeaders();
-        headers.add("sessionId", sessionId);
-        WineOrder wineOrder = WineOrder.builder().orderId(orderId).wineId(wineId).build();
-        HttpEntity entity = new HttpEntity<>(wineOrder, headers);
-
-        Orders actual = restTemplate.exchange(baseUrl + "/orders/wine/remove", PUT, entity, Orders.class).getBody();
-
-        assertEquals(orderArraySize.intValue(), actual.getWineIds().size());
-
-        Wine wine = getWine(wineId, sessionId);
-
-        assertEquals(wineStockToCompare, wine.getStock());
-    }
-
-    private Wine getWine(Integer wineId, String sessionId) {
-        HttpHeaders headers = new HttpHeaders();
-        headers.add("sessionId", sessionId);
-        HttpEntity entity = new HttpEntity<>(headers);
-
-        Wine actual = restTemplate.exchange(baseUrl + "/wines" + "/" + wineId, GET, entity, Wine.class).getBody();
-
-        assertNotNull(actual);
-
-        return actual;
+        userHelper.logout(user.getUsername(), sessionId);
     }
 
 
-    private int createWine(Wine wine, String sessionId) {
-        HttpHeaders headers = new HttpHeaders();
-        headers.add("sessionId", sessionId);
-        HttpEntity entity = new HttpEntity<>(wine, headers);
-        Wine actual = restTemplate.exchange(baseUrl + "/wines", POST, entity, Wine.class).getBody();
-
-        assertEquals(wine.getDescription(), actual.getDescription());
-        assertEquals(wine.getName(), actual.getName());
-        assertEquals(wine.getStock(), actual.getStock());
-
-        return actual.getId();
-    }
-
-    private Integer createOrder(String sessionId) {
-        HttpHeaders headers = new HttpHeaders();
-        headers.add("sessionId", sessionId);
-        HttpEntity entity = new HttpEntity<>(headers);
-        Orders actual = restTemplate.exchange(baseUrl + "/orders", POST, entity, Orders.class).getBody();
-
-        assertNotNull(actual);
-
-        return actual.getId();
-    }
-
-    private void finalizeOrder(Integer orderId, String sessionId) {
-        HttpHeaders headers = new HttpHeaders();
-        headers.add("sessionId", sessionId);
-        HttpEntity entity = new HttpEntity<>(headers);
-
-        restTemplate.exchange(baseUrl + "/orders" + "/" + orderId, DELETE, entity, Void.class);
-    }
-
-    private void createUser(User user) {
-        HttpEntity entity = new HttpEntity<>(user);
-        User actual = restTemplate.exchange(baseUrl + "/users", POST, entity, User.class).getBody();
-
-        assertEquals(user.getUsername(), actual.getUsername());
-        assertEquals(user.getPassword(), actual.getPassword());
-    }
-
-    private void logout(String username, String sessionId) {
-        HttpHeaders headers = new HttpHeaders();
-        headers.add("sessionId", sessionId);
-        HttpEntity entity = new HttpEntity<>(headers);
-
-        restTemplate.exchange(baseUrl + "/users/" + username, DELETE, entity, Void.class);
-    }
-
-    private String auth(String username, String password) {
-        String sessionId = restTemplate
-                .exchange(baseUrl + "/users?username=" + username + "&password=" + password,
-                        GET, HttpEntity.EMPTY, String.class).getBody();
-
-        assertNotNull(sessionId);
-
-        return sessionId;
-    }
 }

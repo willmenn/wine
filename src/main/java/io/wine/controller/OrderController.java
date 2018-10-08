@@ -34,12 +34,6 @@ public class OrderController {
         return repository.save(new Orders());
     }
 
-    @RequestMapping(value = "/{id}", method = DELETE)
-    @ResponseStatus(OK)
-    public Orders deleteOrder(@PathVariable("id") String id) {
-        return new Orders();
-    }
-
     @RequestMapping(value = "/{id}", method = GET, produces = APPLICATION_JSON_VALUE)
     @ResponseStatus(OK)
     public Orders getOrder(@PathVariable("id") Integer id) {
@@ -58,9 +52,9 @@ public class OrderController {
         return service.removeWineToOrder(wineOrder.wineId, wineOrder.orderId);
     }
 
-    @RequestMapping(method = DELETE)
+    @RequestMapping(method = DELETE, value = "/{orderId}")
     @ResponseStatus(NO_CONTENT)
-    public void finalizeOrder(@PathVariable Integer orderId) {
+    public void finalizeOrder(@PathVariable("orderId") Integer orderId) {
         repository.deleteById(orderId);
     }
 
