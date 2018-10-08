@@ -17,3 +17,35 @@ $ ./gradlew build
 ```
 
 OBS: The project is using H2 as database.
+
+----
+
+To be able to use the app you will need to create a User.
+```
+POST http://wine-prog-2.herokuapp.com/users
+
+data:
+{
+"usernmae" : "{nickaname}",
+"password" : "{password}
+}
+```
+
+Then you will need to "authenticate"(it's a very simple implementation).
+
+```
+GET http://wine-prog-2.herokuapp.com/users?username={nick}&password={pass}
+```
+
+the return will be a simple Long trnasformed in Hexadecimal that need to be passed in all others requests in the header with this naming:
+
+```
+sessionId: {Hexadecimal}
+```
+
+In the others API's you will be able to create/update and delete wines and orders.
+
+````
+http://wine-prog-2.herokuapp.com/wines
+
+http://wine-prog-2.herokuapp.com/orders
