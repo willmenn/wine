@@ -57,4 +57,9 @@ public class WineController {
             repository.save(newWine);
         });
     }
+
+    @RequestMapping(method = GET)
+    public Iterable<Wine> getAll() {
+        return repository.findAll();
+    }
 }

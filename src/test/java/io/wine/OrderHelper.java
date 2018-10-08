@@ -9,9 +9,7 @@ import org.springframework.web.client.RestTemplate;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.springframework.http.HttpMethod.DELETE;
-import static org.springframework.http.HttpMethod.POST;
-import static org.springframework.http.HttpMethod.PUT;
+import static org.springframework.http.HttpMethod.*;
 
 class OrderHelper {
 
@@ -24,7 +22,6 @@ class OrderHelper {
         this.baseUrl = baseUrl;
         this.wineHelper = wineHelper;
     }
-
 
     void addWine(Integer orderId, Integer wineId, String sessionId, Integer orderArraySize,
                  Integer wineStockToCompare) {
@@ -67,6 +64,17 @@ class OrderHelper {
         assertNotNull(actual);
 
         return actual.getId();
+    }
+
+    Orders getOrder(Integer orderId, String sessionId) {
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("sessionId", sessionId);
+        HttpEntity entity = new HttpEntity<>(headers);
+        Orders actual = restTemplate.exchange(baseUrl + "/orders/" + orderId, GET, entity, Orders.class).getBody();
+
+        assertNotNull(actual);
+
+        return actual;
     }
 
     void finalizeOrder(Integer orderId, String sessionId) {

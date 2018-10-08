@@ -1,5 +1,6 @@
 package io.wine;
 
+import io.wine.model.Orders;
 import io.wine.model.User;
 import io.wine.model.Wine;
 import io.wine.repository.OrdersRepository;
@@ -11,6 +12,9 @@ import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.web.client.RestTemplate;
+
+import java.util.List;
+import java.util.Random;
 
 import static org.junit.Assert.assertEquals;
 
@@ -53,6 +57,7 @@ public class UserJourneyTest extends WineApplicationTests {
         wineRepository.deleteAll();
     }
 
+    // UserJourney all the cases
     @Test
     public void createOrderAndFinishOrderUserJourneyTest() {
         User user = User.builder().username(USERNAME).password(PASSWORD).build();
@@ -71,6 +76,7 @@ public class UserJourneyTest extends WineApplicationTests {
         userHelper.logout(user.getUsername(), sessionId);
     }
 
+    // User Journey for Store Manager
     @Test
     public void createWineStoreUserJourneyTest() {
         User user = User.builder().username(USERNAME).password(PASSWORD).build();
@@ -96,6 +102,45 @@ public class UserJourneyTest extends WineApplicationTests {
         String whiteWineName = "Vinho Branco";
         Wine wineUpdated = wineHelper.updateWine(wine2Get.toBuilder().name(whiteWineName).build(), sessionId);
         assertEquals(whiteWineName, wineUpdated.getName());
+
+        userHelper.logout(user.getUsername(), sessionId);
+    }
+
+    //User Journey with a buyer of only one type of wine.
+    @Test
+    public void addWineAndFinishesOrder() {
+        initDatabase();
+        User user = User.builder().username("username1").password(PASSWORD).build();
+        userHelper.createUser(user);
+        String sessionId = userHelper.auth(user.getUsername(), user.getPassword());
+        List<Wine> allWines = wineHelper.getAllWines(sessionId);
+
+        Wine wine = allWines.stream().filter(w -> w.getName().equals("tinto2")).findFirst().get();
+
+        Integer orderId = orderHelper.createOrder(sessionId);
+
+        orderHelper.addWine(orderId, wine.getId(), sessionId, 1, 1);
+        orderHelper.addWine(orderId, wine.getId(), sessionId, 2, 0);
+
+        Orders order = orderHelper.getOrder(orderId, sessionId);
+
+        assertEquals(wine.getId(), order.getWineIds().get(0).intValue());
+        assertEquals(wine.getId(), order.getWineIds().get(1).intValue());
+
+        orderHelper.finalizeOrder(orderId, sessionId);
+    }
+
+    private void initDatabase() {
+        User user = User.builder().username(USERNAME).password(PASSWORD).build();
+        userHelper.createUser(user);
+        String sessionId = userHelper.auth(user.getUsername(), user.getPassword());
+        Wine wine1 = Wine.builder().description("description Random1").name("tinto1").stock(1).build();
+        Wine wine2 = Wine.builder().description("description Random2").name("tinto2").stock(2).build();
+        Wine wine3 = Wine.builder().description("description Random3").name("tinto3").stock(3).build();
+
+        wineHelper.createWine(wine1, sessionId);
+        wineHelper.createWine(wine2, sessionId);
+        wineHelper.createWine(wine3, sessionId);
 
         userHelper.logout(user.getUsername(), sessionId);
     }

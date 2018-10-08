@@ -1,10 +1,13 @@
 package io.wine;
 
 import io.wine.model.Wine;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
+
+import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -47,6 +50,18 @@ class WineHelper {
         assertWines(wine, actual);
 
         return actual.getId();
+    }
+
+    List<Wine> getAllWines(String sessionId) {
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("sessionId", sessionId);
+        HttpEntity entity = new HttpEntity<>(headers);
+        List<Wine> body = restTemplate.exchange(baseUrl + "/wines", GET, entity,
+                new ParameterizedTypeReference<List<Wine>>() {}).getBody();
+
+        assertNotNull(body);
+
+        return body;
     }
 
     Wine updateWine(Wine wine, String sessionId) {
