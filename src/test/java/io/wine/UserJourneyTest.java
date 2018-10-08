@@ -99,6 +99,4 @@ public class UserJourneyTest extends WineApplicationTests {
 
         userHelper.logout(user.getUsername(), sessionId);
     }
-
-
 }
