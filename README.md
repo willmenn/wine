@@ -20,6 +20,8 @@ OBS: The project is using H2 as database.
 
 ----
 
+### Small info
+
 To be able to use the app you will need to create a User.
 ```
 POST http://wine-prog-2.herokuapp.com/users
