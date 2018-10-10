@@ -5,3 +5,9 @@ deploy:
   app: wine-prog-2
   api_key:
     secure: X47RV72cD36ZdHuIPQK2Waf5FOSVQdyPjwqy4KCXNLAYowQLacGDjxFLt8q3qHYOvP5dIhlZ2trVQzXWcZ+VH0xI9CmGbmQyo04rEfIkTsbiPDmL1IjsZ+xVVJLodiUN3V+hMj1sEJOl6Ct28o351nSjVRuP86va+htKhCCNBdZGAUkuHfpwOk7S505LaAlai3FXEAEOk/zJ6cMwg8NXfPwRaEe0Pxt42xU24+eOwsvn3YQDLnjro7plyQgRaccIg/eNGtN5WJYfQp2XQsbmNGTHhdtHCeZHl8Id7s4BoNWSWvWgRsjoS+zl+N0zWA9qeomc8SPwwAPAsCokfXD5jhqYazRsDvl9H2hoDTcvWayV8s9BiaHvQyZ31Krscp8xNTQslbC6LAlBoVes2BcApx14wBo3XS9dTzJ6Rd7SSX54w0cy9vwifMCf9ChU1gRNpx91vp1AmLi8OHasxGtmA/PwuRTSJoIpX338T0Kkn7+txChvEV8TmJfu2FVcmr1tmsLXcnA3A4rh0OsfqeiZ1lWlhxEasebDy5C9+soFvzncYbBKDDAkBIUYrqrCvTkkJbf+aYRoMx2PI4AlGpoGMaPyrhGJpmMD76wwdVmB6jN3vYlZKAwSktcAx3cwj4paWe38hvwqOdPpwZ2G89kEwZWukrSJIbY4LlJWXo61UV0=
+before_cache:
+- rm -f $HOME/.gradle/caches/modules-2/modules-2.lock
+cache:
+  directories:
+  - $HOME/.gradle/caches/
+  - $HOME/.gradle/wrapper/
