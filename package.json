@@ -3,7 +3,8 @@
     "bootstrap.native": "^2.0.22",
     "npm": "^5.0.0",
     "react": "^15.3.2",
-    "react-dom": "^15.3.2"
+    "react-dom": "^15.3.2",
+    "xregexp": "^4.2.0"
   },
   "devDependencies": {
     "babel-core": "^6.26.3",
