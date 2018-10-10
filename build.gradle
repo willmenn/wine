@@ -10,11 +10,16 @@ buildscript {
 	}
 }
 
+plugins {
+	id "com.moowork.node" version "0.11"
+}
+
 apply plugin: 'java'
 apply plugin: 'eclipse'
 apply plugin: 'org.springframework.boot'
 apply plugin: 'io.spring.dependency-management'
 
+apply from: 'gradle/scripts/frontend.gradle'
 apply from: 'gradle/scripts/idea.gradle'
 
 group = 'io.wine'

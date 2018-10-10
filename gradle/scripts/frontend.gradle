@@ -1,0 +1,14 @@
+node {
+    version = '8.11.2'
+    npmVersion = '5.6.0'
+    download = true
+    workDir = file("${project.buildDir}/nodejs")
+}
+
+npmInstall {
+    args = ['--no-bin-links']
+}
+
+processResources.dependsOn(npmInstall)
+processResources.dependsOn(npm_run_build)
+npm_run_build.mustRunAfter npmInstall
