@@ -30,7 +30,7 @@ class OrderHelper {
         OrderController.WineOrder wineOrder = OrderController.WineOrder.builder().orderId(orderId).wineId(wineId).build();
         HttpEntity entity = new HttpEntity<>(wineOrder, headers);
 
-        Orders actual = restTemplate.exchange(baseUrl + "/orders/wine/add", PUT, entity, Orders.class).getBody();
+        Orders actual = restTemplate.exchange(baseUrl + "/orders/wine/add", POST, entity, Orders.class).getBody();
 
         assertEquals(orderArraySize.intValue(), actual.getWineIds().size());
 
@@ -46,7 +46,7 @@ class OrderHelper {
         OrderController.WineOrder wineOrder = OrderController.WineOrder.builder().orderId(orderId).wineId(wineId).build();
         HttpEntity entity = new HttpEntity<>(wineOrder, headers);
 
-        Orders actual = restTemplate.exchange(baseUrl + "/orders/wine/remove", PUT, entity, Orders.class).getBody();
+        Orders actual = restTemplate.exchange(baseUrl + "/orders/wine/remove", POST, entity, Orders.class).getBody();
 
         assertEquals(orderArraySize.intValue(), actual.getWineIds().size());
 

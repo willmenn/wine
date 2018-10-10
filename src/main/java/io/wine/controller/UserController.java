@@ -35,7 +35,7 @@ public class UserController {
         return repository.save(user);
     }
 
-    @RequestMapping(method = GET)
+    @RequestMapping(method = POST)
     public String authenticate(@RequestParam String username, @RequestParam String password) {
         User user = repository.findByUsernameAndAndPassword(username, password);
         if (user != null) {
