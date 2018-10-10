@@ -1,6 +1,6 @@
 node {
-    version = '8.11.2'
-    npmVersion = '5.6.0'
+    version = '8.0.0'
+    npmVersion = '5.0.0'
     download = true
     workDir = file("${project.buildDir}/nodejs")
 }

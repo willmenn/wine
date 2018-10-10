@@ -10,6 +10,6 @@ public class ApplicationController {
 
     @RequestMapping("/")
     public String rootRedirect(){
-        return "redirect:/swagger-ui.html";
+        return "index.html";
     }
 }
