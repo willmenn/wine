@@ -9,6 +9,7 @@ import org.springframework.context.annotation.Configuration;
 
 import javax.servlet.*;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -23,7 +24,7 @@ public class FilterConfiguration {
 
         registrationBean.setFilter(new RequestResponseLoggingFilter(sessionMap));
         registrationBean.addUrlPatterns("/wines/*");
-        registrationBean.addUrlPatterns("/order/*");
+        registrationBean.addUrlPatterns("/orders/*");
 
         return registrationBean;
     }
@@ -46,11 +47,12 @@ public class FilterConfiguration {
             HttpServletRequest req = (HttpServletRequest) request;
             String session = req.getHeader("sessionId");
 
-            if (sessionMap.containsKey(session)) {
+            if (session != null && sessionMap.containsKey(session)) {
                 chain.doFilter(request, response);
             } else {
+                HttpServletResponse res = (HttpServletResponse) response;
+                res.sendError(401, "Session Expired");
                 //TODO: make return 401.
-                throw new SessionExpiredException("Session Expired");
             }
         }
 
