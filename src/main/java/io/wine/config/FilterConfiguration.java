@@ -52,7 +52,6 @@ public class FilterConfiguration {
             } else {
                 HttpServletResponse res = (HttpServletResponse) response;
                 res.sendError(401, "Session Expired");
-                //TODO: make return 401.
             }
         }
 
