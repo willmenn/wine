@@ -14,7 +14,6 @@ import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.List;
-import java.util.Random;
 
 import static org.junit.Assert.assertEquals;
 
@@ -113,7 +112,7 @@ public class UserJourneyTest extends WineApplicationTests {
         User user = User.builder().username("username1").password(PASSWORD).build();
         userHelper.createUser(user);
         String sessionId = userHelper.auth(user.getUsername(), user.getPassword());
-        List<Wine> allWines = wineHelper.getAllWines(sessionId);
+        List<Wine> allWines = wineHelper.getAllWinesInOnePage(sessionId);
 
         Wine wine = allWines.stream().filter(w -> w.getName().equals("tinto2")).findFirst().get();
 

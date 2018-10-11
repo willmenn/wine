@@ -52,16 +52,28 @@ class WineHelper {
         return actual.getId();
     }
 
-    List<Wine> getAllWines(String sessionId) {
+    List<Wine> getAllWinesInOnePage(String sessionId) {
         HttpHeaders headers = new HttpHeaders();
         headers.add("sessionId", sessionId);
         HttpEntity entity = new HttpEntity<>(headers);
-        List<Wine> body = restTemplate.exchange(baseUrl + "/wines", GET, entity,
-                new ParameterizedTypeReference<List<Wine>>() {}).getBody();
+        List<Wine> body = restTemplate.exchange(baseUrl + "/wines?page=0&size=10", GET, entity,
+                new ParameterizedTypeReference<WrapperGetAll>() {
+                }).getBody().content;
 
         assertNotNull(body);
 
         return body;
+    }
+
+    static class WrapperGetAll {
+        private List<Wine> content;
+
+        public WrapperGetAll() {
+        }
+
+        public void setContent(List<Wine> content) {
+            this.content = content;
+        }
     }
 
     Wine updateWine(Wine wine, String sessionId) {

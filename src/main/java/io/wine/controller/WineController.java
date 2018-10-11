@@ -4,6 +4,9 @@ import io.wine.exception.WineNotFoundException;
 import io.wine.model.Wine;
 import io.wine.repository.WineRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Optional;
@@ -59,7 +62,9 @@ public class WineController {
     }
 
     @RequestMapping(method = GET)
-    public Iterable<Wine> getAll() {
-        return repository.findAll();
+    public Iterable<Wine> getAll(@RequestParam("page") Integer page,
+                                 @RequestParam("size") Integer size) {
+        PageRequest request = PageRequest.of(page, size, Sort.Direction.ASC, "id");
+        return repository.findAll(request);
     }
 }
