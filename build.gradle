@@ -22,6 +22,7 @@ apply plugin: 'io.spring.dependency-management'
 apply from: 'gradle/scripts/frontend.gradle'
 apply from: 'gradle/scripts/idea.gradle'
 
+archivesBaseName = 'wine'
 group = 'io.wine'
 version = '0.0.1-SNAPSHOT'
 sourceCompatibility = 1.8
