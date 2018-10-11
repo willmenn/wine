@@ -41,9 +41,9 @@ public class WineController {
 
     @RequestMapping(value = "/{id}", method = GET, produces = APPLICATION_JSON_VALUE)
     @ResponseStatus(OK)
-    public Wine getWine(@PathVariable("id") Integer id) {
-        return repository.findById(id)
-                .orElseThrow(WineNotFoundException::new);
+    public WineResource getWine(@PathVariable("id") Integer id) {
+        return new WineResource(repository.findById(id)
+                .orElseThrow(WineNotFoundException::new));
     }
 
     @RequestMapping(value = "/{id}", method = PUT, consumes = APPLICATION_JSON_VALUE, produces = APPLICATION_JSON_VALUE)
