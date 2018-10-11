@@ -36,7 +36,7 @@ data:
 Then you will need to "authenticate"(it's a very simple implementation).
 
 ```
-GET http://wine-prog-2.herokuapp.com/users?username={nick}&password={pass}
+POST http://wine-prog-2.herokuapp.com/users/auth?username={nick}&password={pass}
 ```
 
 the return will be a simple Long trnasformed in Hexadecimal that need to be passed in all others requests in the header with this naming:
