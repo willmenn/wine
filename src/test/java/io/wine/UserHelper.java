@@ -39,7 +39,7 @@ import static org.springframework.http.HttpMethod.POST;
 
      String auth(String username, String password) {
         String sessionId = restTemplate
-                .exchange(baseUrl + "/users?username=" + username + "&password=" + password,
+                .exchange(baseUrl + "/users/auth?username=" + username + "&password=" + password,
                         POST, HttpEntity.EMPTY, String.class).getBody();
 
         assertNotNull(sessionId);
